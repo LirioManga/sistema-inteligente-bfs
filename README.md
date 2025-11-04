@@ -1,138 +1,137 @@
-# 🧭 Mapa Inteligente do Campus
 
-Protótipo de sistema inteligente desenvolvido em **Laravel**, que utiliza o algoritmo de **Busca em Largura (BFS)** para encontrar o **caminho mais curto** entre dois locais de um campus universitário.  
-O sistema apresenta o percurso visualmente num mapa interativo com **Leaflet.js**.
+# 🏥 Sistema Inteligente de Triagem Hospitalar (Gemini + BFS)
 
----
-
-## 🎯 Objectivo do Projecto
-
-O projeto foi desenvolvido no âmbito da disciplina de **Engenharia de Software e Inteligência Artificial**, com o objectivo de aplicar conceitos de **agentes inteligentes**, **modelos PEAS** e **estratégias de busca sem informação** (neste caso, BFS).
-
-O agente é responsável por explorar o ambiente (o mapa do campus) e determinar a melhor rota entre dois pontos.
+## 📘 Visão Geral
+Este projeto combina **IA (Gemini)** e **algoritmos de busca (BFS)** para simular um sistema de triagem hospitalar inteligente.
+O sistema analisa os sintomas do paciente e direciona-o automaticamente ao departamento mais adequado.
 
 ---
 
-## 🧠 Tipo de Agente
-
-**Agente baseado em problemas**
-
-- Formula um problema (encontrar um caminho entre origem e destino);
-- Explora o espaço de estados (locais e ligações);
-- Utiliza a estratégia de busca **BFS** para encontrar a solução mais curta.
+## ⚙️ Tecnologias Usadas
+- **Laravel 11** – Backend e API REST
+- **Gemini API (Google AI)** – Processamento de linguagem natural
+- **Busca em Largura (BFS)** – Decisão do setor interno
+- **MySQL** – Base de dados relacional
+- **Postman / Axios** – Testes e consumo da API
 
 ---
 
-## ⚙️ Modelo PEAS
+## 🧠 Funcionamento Geral
+1. O utilizador insere sintomas via endpoint `/gemini/interpretar`.
+2. A API Gemini devolve `{categoria, gravidade}`.
+3. O agente interno (`BFSService`) percorre os nodos de triagem hospitalar com base nas regras de decisão.
+4. O sistema retorna o departamento recomendado.
 
+---
+
+## 📚 Estrutura do Projeto
+```
+app/
+ ├── Http/Controllers/
+ │   ├── GeminiController.php
+ │   └── TriagemController.php
+ ├── Models/
+ │   ├── Departamento.php
+ │   └── NodoTriagem.php
+ ├── Services/
+ │   └── BFSService.php
+database/
+ ├── migrations/
+ ├── seeders/
+ │   ├── DepartamentoSeeder.php
+ │   └── NodoTriagemSeeder.php
+routes/
+ └── api.php
+```
+
+---
+
+## 🧩 Exemplo de Dados
+
+### 🏥 Tabela: `departamentos`
+| id | nome          | descricao           |
+|----|----------------|--------------------|
+| 1  | Emergência     | Casos críticos     |
+| 2  | Clínica Geral  | Casos leves        |
+| 3  | Pediatria      | Crianças           |
+| 4  | Cardiologia    | Problemas cardíacos|
+
+### 🔗 Tabela: `nodos_triagem`
+| id | pergunta               | sim | nao | departamento_id |
+|----|------------------------|-----|-----|----------------|
+| 1  | Febre alta?            | 2   | 3   | null           |
+| 2  | Dificuldade respiratória?|null|null| 1              |
+| 3  | Criança?               |null|null| 3              |
+
+Os valores nas colunas `sim` e `nao` indicam o **ID do próximo nodo**.
+- Exemplo: o nodo 1 tem `sim=2`, `nao=3`.  
+  Se o paciente tiver febre alta, segue para o nodo 2; caso contrário, para o nodo 3.
+
+---
+
+## 📡 API Documentation
+
+### 1️⃣ `/gemini/interpretar` – Interpretação de Sintomas
+**Método:** POST  
+**Descrição:** Envia texto de sintomas e retorna categoria e gravidade.
+
+#### Request
+```json
+{
+  "texto": "Tenho febre alta e dificuldade para respirar"
+}
+```
+
+#### Response
+```json
+{
+  "categoria": "respiratória",
+  "gravidade": "alta"
+}
+```
+
+---
+
+### 2️⃣ `/triagem/automatica` – Decisão do Departamento
+**Método:** POST  
+**Descrição:** Usa os resultados do Gemini e executa o BFS interno para determinar o departamento.
+
+#### Request
+```json
+{
+  "categoria": "respiratória",
+  "gravidade": "alta"
+}
+```
+
+#### Response
+```json
+{
+  "categoria": "respiratória",
+  "gravidade": "alta",
+  "departamento": "Emergência"
+}
+```
+
+---
+
+## 🧮 Fluxo Resumido
+```mermaid
+graph TD
+A[Usuário] --> B[Gemini: Categoria e Gravidade]
+B --> C[BFSService: Busca em Largura]
+C --> D[Departamento Hospitalar]
+```
+
+---
+
+## 🔍 PEAS
 | Elemento | Descrição |
 |-----------|------------|
-| **Performance** | Eficiência em encontrar o caminho mais curto e o tempo de resposta. |
-| **Environment** | Mapa do campus (representado como um grafo com nós e ligações). |
-| **Actuators** | Movimentos possíveis entre locais (ligados por caminhos). |
-| **Sensors** | Capacidade de identificar o local atual e os caminhos disponíveis. |
+| **P** | Correta classificação de sintomas e decisão rápida |
+| **E** | Ambiente hospitalar e sintomas fornecidos |
+| **A** | Ações: retorno do departamento |
+| **S** | Sintomas e análise do Gemini |
 
 ---
 
-## 🔍 Tipo de Busca
-
-### **Busca em Largura (Breadth-First Search – BFS)**
-
-- Tipo de busca **sem informação**.  
-- Explora o grafo nível a nível, garantindo o **menor número de passos** até ao destino.  
-- Ideal para ambientes simples e discretos (como um mapa de campus).
-
----
-
-## 🧩 Arquitetura do Sistema - Por enquanto
-
-```
-prototipo-campus/
-├── app/
-│   ├── Http/Controllers/
-│   │   └── RotaController.php
-│   ├── Services/
-│   │   └── BuscaService.php
-│   └── Models/
-│       ├── Local.php
-│       └── Ligacao.php
-├── database/
-│   └── migrations/
-│       ├── create_locais_table.php
-│       └── create_ligacoes_table.php
-├── resources/views/
-│   ├── mapa.blade.php
-│   └── layout.blade.php
-└── routes/web.php
-```
-
----
-
-## 🗺️ Interface (Leaflet.js)
-
-- Exibe o mapa do campus com **OpenStreetMap**.
-- O utilizador seleciona **origem** e **destino**.
-- O sistema desenha o **percurso no mapa** com uma linha azul e marcadores.
-
----
-
-## 🛠️ Tecnologias Utilizadas
-
-| Componente | Tecnologia |
-|-------------|-------------|
-| **Backend** | Laravel 12  |
-| **Frontend** | HTML, Tailwind CSS, JavaScript |
-| **Mapas** | Leaflet.js + OpenStreetMap |
-| **Base de Dados** | MySQL |
-| **IA** | Algoritmo de Busca em Largura (BFS) |
-| **Documentação** | Draw.io, Markdown, Word/PDF |
-
----
-
-## 🚀 Instalação
-
-1. Clonar o repositório:
-   ```bash
-   git clone https://github.com/LirioManga/mapa-inteligente-campus.git
-   cd mapa-inteligente-campus
-   ```
-
-2. Instalar dependências:
-   ```bash
-   composer install
-   npm install && npm run dev
-   ```
-
-3. Configurar o ambiente:
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   php artisan migrate
-   ```
-
-4. Executar o servidor:
-   ```bash
-   php artisan serve
-   ```
-
-5. Aceder no navegador:
-   ```
-   http://localhost:8000
-   ```
-
----
-
-## 🔮 Melhorias Futuras - Mas podes fazer isso, agora
-- Permitir **rotas alternativas** ou por categorias (edifícios, cantina, biblioteca) -- mas entramos na **BUSCA HEURISTICA**.  
-- Tornar o mapa **dinâmico**, permitindo adicionar novos pontos via interface.
-
----
-
-## 👨‍💻 Equipa de Desenvolvimento
-
-| Nome | Função |
-|------|--------|
-| [Lírio Manga] | Backend e Integração BFS |
-| [Fernando Maleiane] | Documentação, Diagramas e Interface |
-
----

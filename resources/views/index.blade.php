@@ -341,6 +341,8 @@
             // Show loading
             document.getElementById('loadingSpinner').classList.remove('hidden');
 
+            scrollToBottom()
+
             const url = 'http://localhost:8000/gemini/interpretar';
 
             try {
@@ -360,6 +362,13 @@
 
                 const result = await response.json();
                 console.log(result);
+
+                displayResult({
+                    nome: result.categoria,
+                    descricao: result.mensagem
+                });
+                scrollToBottom();
+
             } catch (error) {
                 console.error(`Erro: ${error}`)
             }
@@ -368,24 +377,6 @@
             // Replace this with actual fetch to your backend
             setTimeout(() => {
                 // Mock response
-                // fetch('/gemini/interpretar', {
-                //     method: 'POST',
-                //     headers: {
-                //     'Content-type': 'application/json',
-                //     // 'apikey': apiKey
-                //     },
-                //     // body: data
-                // }).then(response => {
-                //     if (response.ok) {
-                //         console.log
-                //     return response.json();
-                //     }
-                //     throw new Error('Request failed!');
-                // }, networkError => {
-                //     console.log(networkError.message)
-                // })
-
-
                 // const mockDepartment = {
                 //     nome: 'Cardiologia',
                 //     descricao: 'Com base nos sintomas informados, recomendamos atendimento no departamento de Cardiologia.'
@@ -393,6 +384,14 @@
 
                 // displayResult(mockDepartment);
             }, 1500);
+        }
+
+        //Scroll to bottom
+        function scrollToBottom() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            })
         }
 
         // Display result

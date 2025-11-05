@@ -48,7 +48,7 @@ class GeminiController extends Controller
     //         return response()->json([
     //             'categoria' => $json['categoria'] ?? 'geral',
     //             'gravidade' => $json['gravidade'] ?? 'baixa',
-    //             'raw' => $output 
+    //             'raw' => $output
     //         ]);
     //     } catch (\Exception $e) {
     //         return response()->json(['erro' => 'Erro ao conectar à API: ' . $e->getMessage()], 500);
@@ -83,40 +83,40 @@ class GeminiController extends Controller
 
             $data = $response->json();
 
-       
+
             $output = $data['candidates'][0]['content']['parts'][0]['text'] ?? ($data['output'] ?? '{}');
 
             // 1) Remover blocos de markdown ```json ... ``` ou ``` ... ```
             $clean = preg_replace('/```(?:json)?\s*/i', '', $output);
             $clean = preg_replace('/\s*```/i', '', $clean);
 
-          
+
             $clean = trim($clean);
 
-           
+
             $jsonText = null;
             if (preg_match('/(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])/s', $clean, $matches)) {
                 $jsonText = $matches[1];
             } else {
-               
+
                 if (strpos($clean, '{') !== false && strrpos($clean, '}') !== false) {
                     $jsonText = substr($clean, strpos($clean, '{'), strrpos($clean, '}') - strpos($clean, '{') + 1);
                 } else {
                     $jsonText = $clean;
                 }
             }
-            
+
             $jsonText = preg_replace('/,(\s*[\]\}])/s', '$1', $jsonText);
             $decoded = json_decode($jsonText, true);
 
-          
+
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $decoded = json_decode($clean, true);
             }
 
-           
+
             if (!is_array($decoded) || empty($decoded)) {
-               
+
                 return response()->json([
                     'categoria' => 'geral',
                     'gravidade' => 'baixa',
@@ -139,10 +139,10 @@ class GeminiController extends Controller
                 $categoria = mb_strtolower(trim($decoded['categoria']));
                 $gravidade = $normalizeSeverity($decoded['gravidade']);
             } else {
-               
+
                 $items = $decoded;
-                if (array_values($items) === $items) { 
-                    
+                if (array_values($items) === $items) {
+
                     $chosen = null;
                     $priorities = ['alta' => 3, 'media' => 2, 'baixa' => 1];
                     $bestScore = 0;

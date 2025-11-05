@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\NoTriagem;
+use Illuminate\Support\Facades\Log;
 
 class BFSService
 {
@@ -16,10 +17,13 @@ class BFSService
 
     public function buscarDepartamentoInteligente(string $categoria, string $gravidade)
     {
+
+        Log::info("dados recebidos $categoria, $gravidade");
         $fila = [NoTriagem::find(1)];
         $visitados = [];
 
         while (!empty($fila)) {
+            Log::info("filas: ", $fila);
             $nodo = array_shift($fila);
             if (!$nodo || in_array($nodo->id, $visitados)) continue;
 
@@ -51,6 +55,7 @@ class BFSService
         $categoria = strtolower($categoria ?? '');
         $gravidade = strtolower($gravidade ?? '');
 
+        Log::info("pergunta: $pergunta, categoria: $categoria e gravidade: $gravidade");
         // Emergência: febre alta, dificuldade respiratória, dor intensa
         if (str_contains($pergunta, 'febre') && $gravidade === 'alta') {
             return true;

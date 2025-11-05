@@ -175,12 +175,12 @@ class GeminiController extends Controller
 
             $categoria = $categoria ?: 'geral';
             $gravidade = $gravidade ?: 'baixa';
-            $departamento = $bfs->buscarDepartamentoInteligente('respiratória', 'alta');
+            $departamento = $bfs->buscarDepartamentoInteligente($categoria, $gravidade);
 
             return response()->json([
                 'categoria' => $categoria,
                 'gravidade' => $gravidade,
-                'mensagem' => $departamento,
+                'mensagem' => 'Caro paciente, dirija-se ao sector de ' . $departamento,
                 'raw' => $output
             ]);
         } catch (\Exception $e) {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Triagem;
+use App\Models\User;
 use App\Services\BFSService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -176,6 +178,15 @@ class GeminiController extends Controller
             $categoria = $categoria ?: 'geral';
             $gravidade = $gravidade ?: 'baixa';
             $departamento = $bfs->buscarDepartamentoInteligente($categoria, $gravidade);
+            $ultimoPacienteId = User::latest('id')->value('id');
+
+            Triagem::create([
+                'sintomas'     => $texto,
+                'categoria'    => $categoria,
+                'gravidade'    => $gravidade,
+                'departamento' => $departamento,
+                'paciente_id'  => $ultimoPacienteId,
+            ]);
 
             return response()->json([
                 'categoria' => $categoria,

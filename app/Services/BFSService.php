@@ -56,7 +56,7 @@ class BFSService
         $gravidade = strtolower($gravidade ?? '');
 
         Log::info("pergunta: $pergunta, categoria: $categoria e gravidade: $gravidade");
-        // Emergência: febre alta, dificuldade respiratória, dor intensa
+        
         if (str_contains($pergunta, 'febre') && $gravidade === 'alta') {
             return true;
         }
@@ -65,12 +65,12 @@ class BFSService
             return true;
         }
 
-        // Crianças → Pediatria
+     
         if (str_contains($pergunta, 'criança') && str_contains($categoria, 'pedi')) {
             return true;
         }
 
-        // Casos leves → Clínica Geral
+        
         if (str_contains($pergunta, 'geral') || str_contains($pergunta, 'leve')) {
             if ($gravidade === 'baixa' && (
                 str_contains($categoria, 'geral') ||

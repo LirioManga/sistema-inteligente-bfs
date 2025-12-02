@@ -11,9 +11,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
+        $middleware->alias([
+            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+        ]);
+
         $middleware->validateCsrfTokens(except: [
-            
             'http://localhost:8000/gemini/interpretar',
+            'http://localhost:8000/pacientes/registar',
+            'http://localhost:8000/triagem/{id}/departamento',
+            'http://localhost:8000/triagem/listar'
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

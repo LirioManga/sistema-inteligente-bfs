@@ -135,3 +135,87 @@ C --> D[Departamento Hospitalar]
 
 ---
 
+
+## 🔐 Autenticação
+
+### **POST /login**  
+Autentica um usuário com email e password.
+
+**Body**
+```json
+{
+  "email": "admin@gmail.com",
+  "password": "123456"
+}
+
+{
+  "success": true,
+  "mensagem": "Login efetuado com sucesso",
+  "user": {
+    "id": 1,
+    "name": "Admin",
+    "email": "admin@gmail.com",
+    "role": "admin"
+  }
+}
+
+{
+  "success": false,
+  "mensagem": "Email ou password incorretos"
+}
+```
+## Pacientes
+
+### **POST /pacientes/registar**  
+``` json
+{
+  "name": "Carlos Mucavele",
+  "email": "carlos@gmail.com"
+}
+
+{
+  "success": true,
+  "message": "Paciente registado com sucesso",
+  "paciente": {
+    "id": 10,
+    "name": "Carlos Mucavele",
+    "email": "carlos@gmail.com",
+    "role": "paciente"
+  }
+}
+```
+### **GET /triagem/listar**
+```json
+[
+  {
+    "id": 1,
+    "sintomas": "Dor intensa no peito",
+    "categoria": "urgente",
+    "gravidade": "alta",
+    "departamento": "Cardiologia",
+    "paciente_id": 10,
+    "paciente": {
+      "id": 10,
+      "name": "Carlos Mucavele",
+      "email": "carlos@gmail.com"
+    }
+  }
+]
+
+```
+### **PUT /triagem/{id}/departamento**
+```json
+{
+  "departamento": "Ortopedia"
+}
+
+
+{
+  "success": true,
+  "mensagem": "Departamento atualizado com sucesso!",
+  "triagem": {
+    "id": 1,
+    "departamento": "Ortopedia"
+  }
+}
+```

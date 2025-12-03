@@ -453,6 +453,17 @@
 
         // Logout
         function logout() {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.delete('admin');
+
+            let newUrl = window.location.pathname;
+            const search = urlParams.toString();
+
+            if (search) {
+                newUrl += search;
+            }
+
+            window.history.replaceState({}, '', newUrl);
             isAuthenticated = false;
             document.getElementById('adminView').classList.add('hidden');
             document.getElementById('patientView').classList.remove('hidden');

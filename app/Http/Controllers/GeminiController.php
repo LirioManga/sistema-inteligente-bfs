@@ -179,6 +179,7 @@ class GeminiController extends Controller
             $gravidade = $gravidade ?: 'baixa';
             $departamento = $bfs->buscarDepartamentoInteligente($categoria, $gravidade);
             $ultimoPacienteId = User::latest('id')->value('id');
+            $paciente = User::find($ultimoPacienteId);
 
             Triagem::create([
                 'sintomas'     => $texto,
@@ -191,7 +192,7 @@ class GeminiController extends Controller
             return response()->json([
                 'categoria' => $categoria,
                 'gravidade' => $gravidade,
-                'mensagem' => 'Caro paciente, dirija-se ao sector de ' . $departamento,
+                'mensagem' => 'Caro paciente ' . $paciente->name . ', dirija-se ao sector de ' . $departamento,
                 'raw' => $output
             ]);
         } catch (\Exception $e) {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\GeminiController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\TriagemController;
@@ -16,10 +17,10 @@ Route::post('/triagem/automatica', [TriagemController::class, 'triagemAutomatica
 Route::put('/triagem/{id}/departamento', [TriagemController::class, 'atualizarDepartamento']);
 Route::get('/triagem/listar', [TriagemController::class, 'listar']);
 Route::post('/pacientes/registar', [PacienteController::class, 'store']);
-
+Route::get('/departamentos', [DepartamentoController::class, 'index']);
 
 Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'logout'])->middleware('auth:sanctum');
 
 
-require __DIR__.'/auth.php';
+// require __DIR__.'/auth.php';
